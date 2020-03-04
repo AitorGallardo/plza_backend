@@ -1,31 +1,48 @@
 const express = require('express');
 
-const morgan = require('morgan')
-const helmet = require('helmet')
-const cors = require('cors')
+const morgan = require('morgan');
+const helmet = require('helmet');
+const cors = require('cors');
+const mongoose = require('mongoose');
 
-const middlewares = require('./middlewares')  
+require('dotenv').config();
+
+const middlewares = require('./middlewares');
+const logs = require('./api/logs');
 
 const app = express();
-app.use(morgan('common'))
-app.use(helmet())
+app.use(morgan('common'));
+app.use(helmet());
 app.use(cors({
-    origin: 'http://localhost:3000'
-}))
+  origin: process.env.CORS_ORIGIN,
+}));
+// parser json body
+app.use(express.json());
 
-app.get('/', (req, res)=>{
-    res.json({
-      messsage: 'Hello World!'  
-    })
-})
+const url = 'mongodb+srv://pplza:plazadbconnectionagm1@plazadbtest-qhu6o.mongodb.net/local_library?retryWrites=true&w=majority';
+mongoose.connect(url, {
+  useNewUrlParser: true,
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+app.get('/', (req, res) => {
+  res.json({
+    messsage: 'Hello World!',
+  });
+});
+
+app.use('/api/logs', logs);
+
 
 // not found err handler
-app.use(middlewares.notFound)
+app.use(middlewares.notFound);
 
 // general err handler
-app.use(middlewares.errorHandler)
+app.use(middlewares.errorHandler);
 
 const port = process.env.PORT || 1337;
-app.listen(port, ()=>{
-    console.log('Listen at http://localhost:1337');
-})
+app.listen(port, () => {
+  console.log('Listen at http://localhost:1337');
+});
