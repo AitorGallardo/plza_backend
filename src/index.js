@@ -13,16 +13,22 @@ const logs = require('./api/logs');
 const app = express();
 app.use(morgan('common'));
 app.use(helmet());
+const corsWhiteList = [process.env.CORS_ORIGIN, process.env.CORS_CLIENT];
 app.use(cors({
-  origin: process.env.CORS_ORIGIN,
+  origin(origin, callback) {
+    if (corsWhiteList.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
 }));
+
+
 // parser json body
 app.use(express.json());
 
-console.log('HEHEHEHH', process.env.CORS_ORIGIN)
-
-const url = 'mongodb+srv://pplza:plazadbconnectionagm1@plazadbtest-qhu6o.mongodb.net/local_library?retryWrites=true&w=majority';
-mongoose.connect(url, {
+mongoose.connect(process.env.DATABASE_ATLAS_URL, {
   useNewUrlParser: true,
 });
 
