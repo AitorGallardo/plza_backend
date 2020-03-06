@@ -20,7 +20,8 @@
     "NODE_ENV": "production",
     "PORT": "1337",
     "DATABASE_ATLAS_URL": "@log-db",
-    "CORS_ORIGIN":"",
+    "CORS_ORIGIN":"http://localhost:3000",
+    "CORS_CLIENT":"http://localhost:4200",
     "API_KEY":""
   }
 }
