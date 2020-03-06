@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "name": "plaza_backend",
+  "builds": [
+    {
+      "src": "src/index.js",
+      "use": "@now/node-server"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/.*",
+      "dest": "src/index.js"
+    }
+  ],
+  "alias": [
+    "plaza_backend"
+  ],
+  "env":{
+    "NODE_ENV": "production",
+    "PORT": "1337",
+    "DATABASE_ATLAS_URL": "@log-db",
+    "CORS_ORIGIN":"",
+    "API_KEY":""
+  }
+}

@@ -19,6 +19,8 @@ app.use(cors({
 // parser json body
 app.use(express.json());
 
+console.log('HEHEHEHH', process.env.CORS_ORIGIN)
+
 const url = 'mongodb+srv://pplza:plazadbconnectionagm1@plazadbtest-qhu6o.mongodb.net/local_library?retryWrites=true&w=majority';
 mongoose.connect(url, {
   useNewUrlParser: true,
