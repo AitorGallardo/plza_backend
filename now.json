@@ -14,7 +14,7 @@
     }
   ],
   "alias": [
-    "plaza_backend"
+    "plza-backend.now.sh"
   ],
   "env":{
     "NODE_ENV": "production",
