@@ -13,9 +13,6 @@
       "dest": "src/index.js"
     }
   ],
-  "alias": [
-    "plza-backend.now.sh"
-  ],
   "env":{
     "NODE_ENV": "production",
     "PORT": "1337",

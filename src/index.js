@@ -15,13 +15,7 @@ app.use(morgan('common'));
 app.use(helmet());
 const corsWhiteList = [process.env.CORS_ORIGIN, process.env.CORS_CLIENT];
 app.use(cors({
-  origin(origin, callback) {
-    if (corsWhiteList.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: corsWhiteList,
 }));
 
 
