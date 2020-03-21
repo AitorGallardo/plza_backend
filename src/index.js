@@ -14,10 +14,11 @@ const event = require('./api/event');
 const app = express();
 app.use(morgan('common'));
 app.use(helmet());
-const corsWhiteList = [process.env.CORS_ORIGIN, process.env.CORS_CLIENT];
-app.use(cors({
-  origin: corsWhiteList,
-}));
+// const corsWhiteList = [process.env.CORS_ORIGIN, process.env.CORS_CLIENT];
+// {
+//   origin: corsWhiteList,
+// }
+app.use(cors());
 
 
 // parser json body
