@@ -9,6 +9,7 @@ require('dotenv').config();
 
 const middlewares = require('./middlewares');
 const logs = require('./api/logs');
+const event = require('./api/event');
 
 const app = express();
 app.use(morgan('common'));
@@ -36,6 +37,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/logs', logs);
+app.use('/api/event', event);
 
 
 // not found err handler
