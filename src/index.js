@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const middlewares = require('./middlewares');
+const auth = require('./auth/index');
 const logs = require('./api/logs');
 const event = require('./api/event');
 
@@ -37,6 +38,7 @@ app.get('/', (req, res) => {
   });
 });
 
+app.use('/auth', auth);
 app.use('/api/logs', logs);
 app.use('/api/event', event);
 
