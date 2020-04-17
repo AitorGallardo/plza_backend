@@ -10,8 +10,30 @@ const router = express.Router();
 const schema = Joi.object().keys({
   username: Joi.string().regex(/(^[a-zA-Z0-9_]+$)/).min(2).max(30)
     .required(),
-  password: Joi.string().min(10).required(),
+  password: Joi.string().trim().min(10).required(),
 });
+
+function respondError422(res, next) {
+  res.status(422);
+  const error = new Error('Unable to login');
+  next(error);
+}
+
+function createTokenSendResponse(user, res, next) {
+  const payload = {
+    id: user._id,
+    username: user.username,
+    role: user.role,
+    active: user.active,
+  };
+  jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1d' }, (err, token) => {
+    if (err) {
+      respondError422(res, next);
+    } else {
+      res.json({ token });
+    }
+  });
+}
 
 
 router.get('/', (req, res) => {
@@ -38,7 +60,7 @@ router.post('/signup', (req, res, next) => {
 
           const newuser = new User(userBody);
           newuser.save().then((createdUser) => {
-            res.json({ createdUser });
+            createTokenSendResponse(createdUser, res, next);
           });
         });
       }
@@ -47,12 +69,6 @@ router.post('/signup', (req, res, next) => {
     next(result.error);
   }
 });
-
-function respondError422(res, next) {
-  res.status(422);
-  const error = new Error('Unable to login');
-  next(error);
-}
 
 router.post('/login', (req, res, next) => {
   const result = Joi.validate(req.body, schema);
@@ -65,19 +81,7 @@ router.post('/login', (req, res, next) => {
         const hashedPassword = user.password;
         bcrypt.compare(req.body.password, hashedPassword).then((hashres) => {
           if (hashres === true) {
-            const payload = {
-              id: user._id,
-              username: user.username,
-            };
-            console.log( process.env.TOKEN_SECRET);
-            
-            jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1d' }, (err, token) => {
-              if (err) {
-                respondError422(res, next);
-              } else {
-                res.json({token})
-              }
-            });
+            createTokenSendResponse(user, res, next);
           } else {
             respondError422(res, next);
           }

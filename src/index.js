@@ -8,9 +8,11 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const middlewares = require('./middlewares');
+const authMiddlewares = require('./auth/middlewares');
 const auth = require('./auth/index');
 const logs = require('./api/logs');
 const event = require('./api/event');
+const users = require('./api/users');
 
 const app = express();
 app.use(morgan('common'));
@@ -24,6 +26,7 @@ app.use(cors());
 
 // parser json body
 app.use(express.json());
+app.use(authMiddlewares.checkTokenSendUser);
 
 mongoose.connect(process.env.DATABASE_ATLAS_URL, {
   useNewUrlParser: true,
@@ -34,13 +37,15 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.get('/', (req, res) => {
   res.json({
-    messsage: 'Hello World!',
+    messsage: '🏀',
+    user: req.user,
   });
 });
 
 app.use('/auth', auth);
 app.use('/api/logs', logs);
 app.use('/api/event', event);
+app.use('/api/users', authMiddlewares.isLoggedIn, authMiddlewares.isAdmin, users);
 
 
 // not found err handler

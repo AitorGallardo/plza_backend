@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const defaultDate = { type: Date, default: Date.now, required: true };
-
 const userSchema = new Schema({
   id: String,
   username: {
@@ -13,6 +11,8 @@ const userSchema = new Schema({
   mail: String,
   password: String,
   image: String,
+  role: { type: String, default: 'user' },
+  active: { type: String, default: false },
   meta: {
     votes: Number,
     favs: Number,
