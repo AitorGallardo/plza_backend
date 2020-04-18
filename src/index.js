@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
+
 require('dotenv').config();
 
 const middlewares = require('./middlewares');
@@ -37,7 +38,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.get('/', (req, res) => {
   res.json({
-    messsage: '🏀',
+    message: '🏀',
     user: req.user,
   });
 });
