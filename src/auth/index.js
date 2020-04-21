@@ -26,11 +26,23 @@ function createTokenSendResponse(user, res, next) {
     role: user.role,
     active: user.active,
   };
-  jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1d' }, (err, token) => {
+  jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: 30 }, (err, token) => {
     if (err) {
       respondError422(res, next);
     } else {
-      res.json({ token });
+
+      const response = {
+        username: user.username,
+        avatar: user.image,
+        description: user.description,
+        following: user.following,
+        followers: user.followers,
+        events: user.events,
+        token: token,
+      }
+
+      res.statusMessage = 'User created successfully.';
+      res.json({ response });
     }
   });
 }
@@ -49,7 +61,7 @@ router.post('/signup', (req, res, next) => {
     }).then((user) => {
       // if user is undefined, username is not in the db, otherwise, duplicate user
       if (user) {
-        const error = new Error('User already exist');
+        const error = new Error('Current username is already taken');
         next(error);
       } else {
         bcrypt.hash(req.body.password, 12).then((hashedPassword) => {
