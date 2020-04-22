@@ -7,6 +7,9 @@ const authMiddlewares = require('../auth/middlewares');
 const storage = require('../helpers/storage-connection');
 
 const router = express.Router();
+const imageRouter = express.Router({mergeParams: true});
+
+router.use('/:id/image', imageRouter);
 
 const userSchema = Joi.object().keys({
   username: Joi.string()
@@ -17,7 +20,7 @@ const userSchema = Joi.object().keys({
     .trim()
     .min(10),
   mail: Joi.string().email({ tlds: { allow: true } }),
-  image: Joi.string().regex(/.*\.(jpe?g|bmp|png)$/),
+  avatar: Joi.string().regex(/.*\.(jpe?g|bmp|png)$/),
   description: Joi.string().max(80),
   instagram: Joi.string().max(30),
 });
@@ -37,7 +40,7 @@ router.get('/', async (req, res, next) => {
   try {
     console.log('currentuser', req.user);
 
-    const result = await User.find({}).select('username image -_id');
+    const result = await User.find({}).select('username avatar -_id');
     res.json(result);
   } catch (error) {
     next(error);
@@ -65,7 +68,7 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.patch('/:id', authMiddlewares.isLoggedIn, storage.upload.single('image'), async (req, res, next) => {
+router.patch('/:id', authMiddlewares.isLoggedIn, storage.upload.single('avatar'), async (req, res, next) => {
   try {
     const result = userSchema.validate(req.body);
     if (!result.error) {
@@ -76,12 +79,36 @@ router.patch('/:id', authMiddlewares.isLoggedIn, storage.upload.single('image'),
         if (updatedParams.password) {
           updatedParams.password = await bcrypt.hash(updatedParams.password, 12);
         }
-        if (updatedParams.image) {
+        if (updatedParams.avatar) {
           await storage.googleBucket.upload(req.file.path, { gzip: true });
-          updatedParams.image = `https://storage.googleapis.com/${storage.bucketName}/${req.file.filename}`;
+          updatedParams.avatar = `https://storage.googleapis.com/${storage.bucketName}/${req.file.filename}`;
         }
+
         const updatedUser = await User.findOneAndUpdate(userId, { $set: updatedParams }, { new: true });
         res.json(updatedUser);
+      } else {
+        next();
+      }
+    } else {
+      res.status(422);
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+imageRouter.patch('/', authMiddlewares.isLoggedIn, storage.upload.single('image'), async (req, res, next) => {
+  try {
+    const imageSchema = Joi.object().keys({ image: Joi.string().regex(/.*\.(jpe?g|bmp|png)$/) });
+    const result = imageSchema.validate(req.body);
+    if (!result.error) {
+      const userId = req.user.id;
+      const user = await User.find({ _id: userId });
+      if (user) {
+        await storage.googleBucket.upload(req.file.path, { gzip: true });
+        const image = `https://storage.googleapis.com/${storage.bucketName}/${req.file.filename}`;
+        const updatedImages = await User.findOneAndUpdate({ _id: userId }, { $push: { images: image } }, { new: true }).select('images -_id');
+        res.json(updatedImages);
       } else {
         next();
       }

@@ -33,7 +33,7 @@ function createTokenSendResponse(user, res, next) {
 
       const response = {
         username: user.username,
-        avatar: user.image,
+        avatar: user.avatar,
         description: user.description,
         following: user.following,
         followers: user.followers,

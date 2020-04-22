@@ -12,7 +12,7 @@ const userSchema = new Schema({
   },
   mail: String,
   password: String,
-  image: String,
+  avatar: String,
   tag: String,
   role: { type: String, default: 'user' },
   active: { type: Boolean, default: false },
