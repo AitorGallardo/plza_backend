@@ -7,6 +7,8 @@ const userSchema = new Schema({
   username: {
     type: String,
     required: true,
+    unique: true,
+    dropDups: true,
   },
   mail: String,
   password: String,
@@ -14,9 +16,10 @@ const userSchema = new Schema({
   tag: String,
   role: { type: String, default: 'user' },
   active: { type: Boolean, default: false },
-  following: { type: Number, default: 0 },
-  followers: { type: Number, default: 0 },
-  events: { type: Number, default: 0 },
+  following: [{ type: String }],
+  followers: [{ type: String }],
+  events: [{ type: String }],
+  images: [{ type: String }],
   description: { type: String, maxlength: 80, default: '' },
   instagram: { type: String, default: '' },
   meta: {

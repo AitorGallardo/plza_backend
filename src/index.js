@@ -12,7 +12,7 @@ const middlewares = require('./middlewares');
 const authMiddlewares = require('./auth/middlewares');
 const auth = require('./auth/index');
 const logs = require('./api/logs');
-const event = require('./api/event');
+const event = require('./api/events');
 const users = require('./api/users');
 
 const app = express();
@@ -45,8 +45,8 @@ app.get('/', (req, res) => {
 
 app.use('/auth', auth);
 app.use('/api/logs', logs);
-app.use('/api/event', event);
-app.use('/api/users', authMiddlewares.isLoggedIn, authMiddlewares.isAdmin, users);
+app.use('/api/events', event);
+app.use('/api/users', users);
 
 
 // not found err handler

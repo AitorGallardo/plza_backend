@@ -26,7 +26,7 @@ function createTokenSendResponse(user, res, next) {
     role: user.role,
     active: user.active,
   };
-  jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: 30 }, (err, token) => {
+  jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1d' }, (err, token) => {
     if (err) {
       respondError422(res, next);
     } else {
