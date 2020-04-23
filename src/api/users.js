@@ -79,12 +79,12 @@ router.patch('/:id', authMiddlewares.isLoggedIn, storage.upload.single('avatar')
         if (updatedParams.password) {
           updatedParams.password = await bcrypt.hash(updatedParams.password, 12);
         }
-        if (updatedParams.avatar) {
+        if (req.file) {
           await storage.googleBucket.upload(req.file.path, { gzip: true });
           updatedParams.avatar = `https://storage.googleapis.com/${storage.bucketName}/${req.file.filename}`;
         }
 
-        const updatedUser = await User.findOneAndUpdate(userId, { $set: updatedParams }, { new: true });
+        const updatedUser = await User.findOneAndUpdate(userId, { $set: updatedParams }, { new: true }).select('description instagram username avatar -_id');
         res.json(updatedUser);
       } else {
         next();
