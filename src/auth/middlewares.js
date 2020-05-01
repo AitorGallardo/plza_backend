@@ -8,15 +8,17 @@ function unAuthorized(res, next) {
 
 function checkTokenSendUser(req, res, next) {
   const authHeader = req.get('authorization');
-
   if (authHeader) {
-    jwt.verify(authHeader, process.env.TOKEN_SECRET, (err, user) => {
-      if (err) {
-        console.log(err);
-      }
-      req.user = user;
-      next();
-    });
+    const token = authHeader.replace('Bearer', '').trim();
+    if (token) {
+      jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
+        if (err) {
+          console.log(err);
+        }
+        req.user = user;
+        next();
+      });
+    }
   } else {
     next();
   }

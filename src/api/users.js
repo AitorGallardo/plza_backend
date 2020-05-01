@@ -7,7 +7,7 @@ const authMiddlewares = require('../auth/middlewares');
 const storage = require('../helpers/storage-connection');
 
 const router = express.Router();
-const imageRouter = express.Router({mergeParams: true});
+const imageRouter = express.Router({ mergeParams: true });
 
 router.use('/:id/image', imageRouter);
 
@@ -70,21 +70,24 @@ router.get('/:id', async (req, res, next) => {
 
 router.patch('/:id', authMiddlewares.isLoggedIn, storage.upload.single('avatar'), async (req, res, next) => {
   try {
-    const result = userSchema.validate(req.body);
+    const result = userSchema.validate(req.body.data);
     if (!result.error) {
       const userId = req.user.id;
       const user = await User.find({ _id: userId });
       if (user) {
-        const updatedParams = req.body;
+        let updatedParams = JSON.parse(req.body.data);
         if (updatedParams.password) {
           updatedParams.password = await bcrypt.hash(updatedParams.password, 12);
         }
         if (req.file) {
           await storage.googleBucket.upload(req.file.path, { gzip: true });
-          updatedParams.avatar = `https://storage.googleapis.com/${storage.bucketName}/${req.file.filename}`;
+          updatedParams = {
+            ...updatedParams,
+            avatar: `https://storage.googleapis.com/${storage.bucketName}/${req.file.filename}`,
+          };
         }
 
-        const updatedUser = await User.findOneAndUpdate(userId, { $set: updatedParams }, { new: true }).select('description instagram username avatar -_id');
+        const updatedUser = await User.findOneAndUpdate({ _id: userId }, { $set: updatedParams }, { new: true }).select('description instagram username avatar -_id');
         res.json(updatedUser);
       } else {
         next();
@@ -94,6 +97,7 @@ router.patch('/:id', authMiddlewares.isLoggedIn, storage.upload.single('avatar')
       throw new Error(result.error);
     }
   } catch (error) {
+    console.log('===>',error)
     next(error);
   }
 });

@@ -26,7 +26,7 @@ function createTokenSendResponse(user, res, next) {
     role: user.role,
     active: user.active,
   };
-  jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1d' }, (err, token) => {
+  jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1d' }, (err, tkn) => {
     if (err) {
       respondError422(res, next);
     } else {
@@ -38,7 +38,7 @@ function createTokenSendResponse(user, res, next) {
         following: user.following,
         followers: user.followers,
         events: user.events,
-        token: token,
+        token: tkn,
       }
 
       res.statusMessage = 'User created successfully.';
